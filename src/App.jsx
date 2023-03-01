@@ -2,6 +2,7 @@ import React from 'react'
 import Dice from './Dice'
 import { nanoid } from 'nanoid'
 import Confetti from 'react-confetti'
+import Timer from './Timer'
 
 function App() {
 
@@ -51,33 +52,49 @@ function App() {
    }
   }, [dices])
 
+  const [gameStatus, setGameStatus] = React.useState(false)
+
+  const startGame = () => {
+    setGameStatus(true)
+  }
+
+
   return (
     <div className='game'>
-      {winningStatus && <Confetti />}
       <div className='container pb-5 pt-5'>
+      {winningStatus && <Confetti />}
+      
         <h1 className='text-center'>Tenzies</h1>
         {<h5 className='text-center'>
           {!winningStatus 
             ? 
           "Roll until all dice are the same. Click each die to freeze it at its current value between rolls." 
             : 
-          "Congratulation! You won!"
+          "Congratulations! You won!"
           }
         </h5>}
 
-        <div className='row justify-content-center gap-2 pt-4'>
-          {diceElements}
-        </div>
+        {gameStatus ? <div className='dice-and-buttons'>
+          <div className='row justify-content-center gap-2 pt-4'>
+            {diceElements}
+          </div>
 
+          <div className='text-center mt-5'>
+            {winningStatus ? 
+              <button onClick={newGame} className='btn btn-success w-25'> 
+                New Game
+              </button> : 
+              <button onClick={rollDice} className='btn btn-primary w-25'>
+                Roll
+              </button>}
+          </div>
+        </div> : 
         <div className='text-center mt-5'>
-          {winningStatus ? 
-            <button onClick={newGame} className='btn btn-success w-25'> 
-              New Game
-            </button> : 
-            <button onClick={rollDice} className='btn btn-primary w-25'>
-              Roll
-            </button>}
-        </div>
+          <button onClick={startGame} className='btn btn-primary w-25'>
+            Start Game
+          </button>
+        </div>}
+
 
       </div>
     </div>
