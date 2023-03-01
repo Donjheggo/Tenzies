@@ -1,71 +1,86 @@
 import React from 'react'
 import Dice from './Dice'
 import { nanoid } from 'nanoid'
+import Confetti from 'react-confetti'
 
-const App = () => {
+function App() {
 
-  const tenRandomNumber = () => {
-    const arr = []
-    for(let i = 0; i < 10; i++){
-      arr.push(
-          {
+  const tenRandomDices = () => {
+    let numbers = []
+      for(let i = 0; i < 10; i ++){
+        numbers.push(
+          { 
             id: nanoid(),
             value: Math.floor(Math.random() * 6), 
             isHeld: false
           }
-        )
-    }
-    return arr
+          )
+      }
+    return numbers
   }
 
-  const [allDices, setAllDices] = React.useState(tenRandomNumber())
-
-
-  const holdDice = (id) => {
-    const updatedDice = allDices.map(dice => {
-      return dice.id === id ? {...dice, isHeld: !dice.isHeld} : dice
-    })
-    setAllDices(updatedDice)
-  }
-
-
-  const roll = () => {
-    const unHoldDice = allDices.map(dice => {
-      return !dice.isHeld ? {...dice, id: nanoid(), value: Math.floor(Math.random()*6), isHeld: false} : dice
-    }) 
-    setAllDices(unHoldDice)
-  }
+  const [dices, setDices] = React.useState(tenRandomDices())
 
   
-  const elements = allDices.map(dice => <Dice key={dice.id} holdDice={() => holdDice(dice.id)} value={dice.value} isHeld={dice.isHeld}/>)
+  const rollDice = () => {
+    setDices(dice => dice.map(dice => {
+      return dice.isHeld === false ? {...dice, value: Math.floor(Math.random()*6)} : dice
+    }))
+  }
 
+  const holdDice = (id) => {
+    setDices(dice => dice.map(item => {
+      return item.id === id ? {...item, isHeld: !item.isHeld} : item
+    }))
+  }
 
+  const newGame = () => {
+    setDices(tenRandomDices())
+  }
 
+  const diceElements = dices.map(dice => <Dice key={dice.id} toggleDice={() => holdDice(dice.id)} value={dice.value} isHeld={dice.isHeld}/>)
+
+  const [winningStatus, setWinningStatus] = React.useState(false)
+
+  React.useEffect( () => {
+    const allHeld = dices.every(item => item.isHeld)
+    const allSameValue = dices.every(item => item.value === dices[0].value)
+   if(allHeld && allSameValue){
+    setWinningStatus(true)
+    console.log("You won")
+   }
+  }, [dices])
 
   return (
-    <div className='main--div'>
-      <div className='main--box container pb-5'>
-        <h1 className='title'>Tenzies</h1>
-        <p className='instruction'> 
-          Roll until all 
-          dice are the same. Click each die to freeze 
-          it at its current value between rolls.
-        </p>
-          <div className='d-flex justify-content-center'>
-            <div className='row gap-3'>
-                {elements}
-            </div>
-          </div>
-          
-          <div className='text-center mt-5'>
-            <button onClick={roll} className='btn btn-primary w-25'>
-              Roll
-            </button>
-          </div>
+    <div className='game'>
+      {winningStatus && <Confetti />}
+      <div className='container pb-5 pt-5'>
+        <h1 className='text-center'>Tenzies</h1>
+        {<h5 className='text-center'>
+          {!winningStatus 
+            ? 
+          "Roll until all dice are the same. Click each die to freeze it at its current value between rolls." 
+            : 
+          "Congratulation! You won!"
+          }
+        </h5>}
 
-
+        <div className='row justify-content-center gap-2 pt-4'>
+          {diceElements}
         </div>
+
+        <div className='text-center mt-5'>
+          {winningStatus ? 
+            <button onClick={newGame} className='btn btn-success w-25'> 
+              New Game
+            </button> : 
+            <button onClick={rollDice} className='btn btn-primary w-25'>
+              Roll
+            </button>}
+        </div>
+
       </div>
+    </div>
   )
 }
 
