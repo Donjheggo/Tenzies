@@ -1,2 +1,2 @@
 # Tenzies
-A mini-game I build while practicing Reactjs
+A mini-game I built while practicing Reactjs
