@@ -2,7 +2,6 @@ import React from 'react'
 import Dice from './Dice'
 import { nanoid } from 'nanoid'
 import Confetti from 'react-confetti'
-import Timer from './Timer'
 
 function App() {
 
